@@ -1,0 +1,34 @@
+{
+  "name": "redux-thunk-testing-library",
+  "version": "0.1.0",
+  "description": "Tools to test redux-thunk actions",
+  "main": "index.js",
+  "repository": "https://github.com/churchcommunitybuilder/redux-thunk-testing-library.git",
+  "author": "Alex Beckwith <alfonz129@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "yarn jest --watch --verbose=false"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "babelConfig": false
+      }
+    }
+  },
+  "dependencies": {
+    "jest": "^24.8.0",
+    "ramda": "^0.26.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@types/ramda": "^0.26.18",
+    "@types/redux": "^3.6.0",
+    "prettier": "^1.18.2",
+    "redux": "^4.0.4",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.3"
+  }
+}
