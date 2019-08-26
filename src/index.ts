@@ -1,3 +1,3 @@
 export * from './types'
-export * from './expectThunk'
+export * from './createExpectThunk'
 export * from './mockReturnValue'

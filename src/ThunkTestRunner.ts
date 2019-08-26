@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { mockReturnValue } from './mockReturnValue'
 import {
   Expectation,
@@ -7,8 +5,8 @@ import {
   MockReturns,
   MockReturnsOrImplementation,
   Thunk,
-  ThunkTestRunnerOptions,
 } from './types'
+import { AnyAction, Store } from 'redux'
 
 const isMockReturns = (
   mock: MockReturnsOrImplementation,
@@ -18,17 +16,14 @@ const isMockImplementation = (
   mock: MockReturnsOrImplementation,
 ): mock is MockImplementation => typeof mock === 'function'
 
-export default class ThunkTestRunner<
-  Options extends ThunkTestRunnerOptions,
-  Action = {}
-> {
+export default class ThunkTestRunner<ExtraArg> {
   private nextAssertionIsInverted = false
-  private thunk: Thunk<Options['extraArg']>
+  private thunk: Thunk<ExtraArg>
   private dispatch: jest.Mock
   private getState: jest.Mock
-  private extraArg: Options['extraArg']
-  private store: Options['store']
-  private expectations: Expectation<Options['extraArg']>[] = []
+  private extraArg: ExtraArg
+  private store: Store
+  private expectations: Expectation<ExtraArg>[] = []
 
   get not() {
     this.nextAssertionIsInverted = true
@@ -36,9 +31,9 @@ export default class ThunkTestRunner<
     return this
   }
 
-  constructor(thunk: Thunk<Options['extraArg']>, options?: Options) {
-    this.extraArg = R.prop('extraArg', options)
-    this.store = R.propOr({}, 'store', options)
+  constructor(thunk: Thunk<ExtraArg>, store: Store, extraArg?: ExtraArg) {
+    this.extraArg = extraArg
+    this.store = store
     this.thunk = thunk
     this.dispatch = jest.fn()
     this.getState = jest.fn(this.store.getState)
@@ -57,7 +52,7 @@ export default class ThunkTestRunner<
     return this
   }
 
-  protected addExpectation(expectation: Expectation<Options['extraArg']>) {
+  protected addExpectation(expectation: Expectation<ExtraArg>) {
     this.expectations = [...this.expectations, expectation]
 
     return this
@@ -67,7 +62,7 @@ export default class ThunkTestRunner<
     return this.mockDependency(mockDispatch, this.dispatch)
   }
 
-  withActions(...actions: Action[]) {
+  withActions(...actions: any) {
     actions.forEach(action => this.store.dispatch(action))
 
     return this
@@ -76,6 +71,14 @@ export default class ThunkTestRunner<
   toDispatch(...action: any) {
     return this.addExpectation(({ dispatch }) => {
       this.getExpectation(dispatch).toHaveBeenCalledWith(...action)
+    })
+  }
+
+  toDispatchActionType(actionCreator: (...args: any[]) => AnyAction) {
+    return this.addExpectation(({ dispatch }) => {
+      this.getExpectation(dispatch).toHaveBeenCalledWith(
+        expect.objectContaining({ type: actionCreator().type }),
+      )
     })
   }
 
@@ -91,7 +94,7 @@ export default class ThunkTestRunner<
     })
   }
 
-  toMeetExpectation(expectation: Expectation<Options['extraArg']>) {
+  toMeetExpectation(expectation: Expectation<ExtraArg>) {
     return this.addExpectation(expectation)
   }
 

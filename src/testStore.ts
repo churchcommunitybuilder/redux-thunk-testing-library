@@ -3,8 +3,9 @@ import { createStore } from 'redux'
 const SET_ID = 'SET_ID'
 
 export const setId = (id: number) => ({ type: SET_ID, payload: id })
+type Action = ReturnType<typeof setId>
 
-const idReducer = (state = 0, action: ReturnType<typeof setId>) => {
+const idReducer = (state = 0, action: Action) => {
   switch (action.type) {
     case SET_ID:
       return action.payload
@@ -13,4 +14,6 @@ const idReducer = (state = 0, action: ReturnType<typeof setId>) => {
   }
 }
 
-export const getStore = () => createStore(idReducer, 0)
+export const getStore = () => createStore<number, Action, any, any>(idReducer)
+
+export type TestState = ReturnType<typeof getStore>

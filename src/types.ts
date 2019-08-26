@@ -1,22 +1,17 @@
-export type Thunk<ExtraArg> = (
+export type Thunk<ExtraArg = any> = (
   dispatch: jest.Mock,
-  getState: jest.Mock<{}>,
+  getState: jest.Mock,
   extraArg: ExtraArg,
 ) => any
 
-export type ThunkTestRunnerOptions = {
-  extraArg?: any
-  store?: any
-}
-
-type ExpectationContext<ExtraArg> = {
+type ExpectationContext<ExtraArg = any> = {
   dispatch: jest.Mock
   getState: jest.Mock
   extraArg: ExtraArg
   output: any
 }
 
-export type Expectation<ExtraArg> = (
+export type Expectation<ExtraArg = any> = (
   context: ExpectationContext<ExtraArg>,
 ) => void
 
