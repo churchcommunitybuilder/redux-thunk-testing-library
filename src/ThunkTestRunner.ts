@@ -56,6 +56,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   protected addExpectation(expectation: Expectation<ExtraArg>) {
     this.expectations = [...this.expectations, expectation]
 
+    this.isNegated = false
     return this
   }
 
@@ -107,7 +108,6 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
     const expectation = expect(value)
 
     if (this.isNegated) {
-      this.isNegated = false
       return expectation.not
     }
 
