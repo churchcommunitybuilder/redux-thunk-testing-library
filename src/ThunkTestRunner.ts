@@ -19,11 +19,12 @@ const isMockImplementation = (
 export class ThunkTestRunner<ExtraArg> {
   private nextAssertionIsInverted = false
   private thunk: Thunk<ExtraArg>
-  private dispatch: jest.Mock
-  private getState: jest.Mock
-  private extraArg: ExtraArg
-  private store: Store
   private expectations: Expectation<ExtraArg>[] = []
+
+  protected store: Store
+  protected dispatch: jest.Mock
+  protected getState: jest.Mock
+  protected extraArg: ExtraArg
 
   get not() {
     this.nextAssertionIsInverted = true
