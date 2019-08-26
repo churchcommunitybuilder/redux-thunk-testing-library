@@ -16,7 +16,7 @@ const isMockImplementation = (
   mock: MockReturnsOrImplementation,
 ): mock is MockImplementation => typeof mock === 'function'
 
-export default class ThunkTestRunner<ExtraArg> {
+export class ThunkTestRunner<ExtraArg> {
   private nextAssertionIsInverted = false
   private thunk: Thunk<ExtraArg>
   private dispatch: jest.Mock

@@ -1,7 +1,6 @@
 import { createExpectThunk } from '../createExpectThunk'
 import { getStore, setId, TestState } from '../testStore'
-import ThunkTestRunner from '../ThunkTestRunner'
-import { AnyAction, Store } from 'redux'
+import { ThunkTestRunner } from '../ThunkTestRunner'
 
 const actionCreator = (value: any) => ({ type: 'type', payload: value })
 const dispatchActionThunk = (value: any) => dispatch =>

@@ -1,5 +1,5 @@
-import ThunkTestRunner from './ThunkTestRunner'
 import { Store } from 'redux'
+
 import { Thunk } from './types'
 
 export const createExpectThunk = <
