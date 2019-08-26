@@ -1,35 +1,37 @@
 import * as R from 'ramda'
 
-import { MockReturns } from './types'
+import { MockReturns, MockReturn } from './types'
+
+const findMatch = (
+  fnArgs: any[],
+  { partial, args, return: returnValue }: MockReturn,
+) => {
+  if (args) {
+    const testArgs = partial ? R.take(args.length, fnArgs) : fnArgs
+
+    return R.equals(testArgs, args) ? returnValue : undefined
+  }
+
+  return returnValue
+}
+
+const isMockReturn = (mock: MockReturns): mock is MockReturn =>
+  !Array.isArray(mock)
 
 export const mockReturnValue = (
   mockFn: jest.Mock<any, any>,
-  mockReturns: MockReturns,
+  mocks: MockReturns,
 ) => {
   mockFn.mockImplementation((...fnArgs: any[]) => {
-    if (!Array.isArray(mockReturns)) {
-      if (mockReturns.args) {
-        const testArgs = mockReturns.partial
-          ? R.take(mockReturns.args.length, fnArgs)
-          : fnArgs
-
-        return R.equals(testArgs, mockReturns.args)
-          ? mockReturns.return
-          : undefined
-      }
-
-      return mockReturns.return
+    if (isMockReturn(mocks)) {
+      return findMatch(fnArgs, mocks)
     }
 
-    const mock = mockReturns.find(({ args, partial }) => {
-      const testArgs = partial ? R.take(args.length, fnArgs) : fnArgs
+    const match = mocks.find(
+      mockReturn => findMatch(fnArgs, mockReturn) !== undefined,
+    )
 
-      return R.equals(testArgs, args)
-    })
-
-    if (mock) {
-      return mock.return
-    }
+    if (match) return match.return
   })
 
   return mockFn
