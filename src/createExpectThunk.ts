@@ -8,6 +8,6 @@ export const createExpectThunk = <
 >(
   TestRunner: Runner,
   createStore: () => Store,
-  extraArg: ExtraArg,
+  getExtraArg: () => ExtraArg,
 ) => (thunk: Thunk<ExtraArg>): InstanceType<Runner> =>
-  new TestRunner(thunk, createStore(), extraArg) as any
+  new TestRunner(thunk, createStore(), getExtraArg()) as any

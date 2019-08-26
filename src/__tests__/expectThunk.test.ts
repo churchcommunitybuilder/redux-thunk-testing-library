@@ -8,10 +8,14 @@ const dispatchActionThunk = (value: any) => dispatch =>
 const dispatchThunk = dispatch => dispatch(1, 2)
 const getStateThunk = (_, getState) => getState()
 const returnThunk = () => 2
-const extraArg = jest.fn(() => 3)
 
 describe('#expectThunk', () => {
-  const expectThunk = createExpectThunk(ThunkTestRunner, getStore, extraArg)
+  const extraArg = jest.fn(() => 3)
+  const expectThunk = createExpectThunk(
+    ThunkTestRunner,
+    getStore,
+    () => extraArg,
+  )
 
   describe('#withDispatch', () => {
     test('should mock dispatch implementation', async () => {
@@ -107,11 +111,11 @@ describe('#expectThunk', () => {
 })
 
 describe('ThunkTestRunner inheritance', () => {
-  const thunk = (x: any) => (_, __, extraArg) => {
-    extraArg(x)
+  const thunk = (x: any) => (_, __, arg) => {
+    arg(x)
   }
 
-  class TestRunner extends ThunkTestRunner<typeof extraArg> {
+  class TestRunner extends ThunkTestRunner<jest.Mock> {
     toCallExtraArgWith(expectedValue: any) {
       return this.addExpectation(({ extraArg }) => {
         this.getExpectation(extraArg).toHaveBeenCalledWith(expectedValue)
@@ -119,10 +123,10 @@ describe('ThunkTestRunner inheritance', () => {
     }
   }
 
-  const expectThunk = createExpectThunk(TestRunner, getStore, extraArg)
+  const expectThunk = createExpectThunk(TestRunner, getStore, () => jest.fn())
 
   test('should be able to add expectation', () => {
-    return expectThunk(thunk)
+    return expectThunk(thunk(1))
       .toCallExtraArgWith(1)
       .run()
   })
