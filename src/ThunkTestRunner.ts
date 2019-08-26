@@ -18,7 +18,7 @@ const isMockImplementation = (
 
 export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   private thunk: Thunk
-  private expectations: Expectation<ExtraArg>[] = []
+  private expectations: ([Expectation<ExtraArg>, boolean])[] = []
 
   protected isNegated = false
   protected store: Store
@@ -54,7 +54,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   }
 
   protected addExpectation(expectation: Expectation<ExtraArg>) {
-    this.expectations = [...this.expectations, expectation]
+    this.expectations = [...this.expectations, [expectation, this.isNegated]]
 
     this.isNegated = false
     return this
@@ -71,26 +71,26 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   }
 
   toDispatch(...action: any[]) {
-    return this.addExpectation(({ dispatch }) => {
-      if (action.length) {
-        this.getExpectation(dispatch).toHaveBeenCalledWith(...action)
+    return this.addExpectation(({ dispatch, isNegated }) => {
+      if (action.length > 0) {
+        this.getExpectation(dispatch, isNegated).toHaveBeenCalledWith(...action)
       } else {
-        this.getExpectation(dispatch).toHaveBeenCalled()
+        this.getExpectation(dispatch, isNegated).toHaveBeenCalled()
       }
     })
   }
 
   toDispatchActionType(actionCreator: (...args: any[]) => AnyAction) {
-    return this.addExpectation(({ dispatch }) => {
-      this.getExpectation(dispatch).toHaveBeenCalledWith(
+    return this.addExpectation(({ dispatch, isNegated }) => {
+      this.getExpectation(dispatch, isNegated).toHaveBeenCalledWith(
         expect.objectContaining({ type: actionCreator().type }),
       )
     })
   }
 
   toReturn(expectedOutput: any, strictEqualityCheck = false) {
-    return this.addExpectation(({ output }) => {
-      const expectation = this.getExpectation(output)
+    return this.addExpectation(({ output, isNegated }) => {
+      const expectation = this.getExpectation(output, isNegated)
 
       if (strictEqualityCheck) {
         expectation.toBe(expectedOutput)
@@ -104,10 +104,10 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
     return this.addExpectation(expectation)
   }
 
-  protected getExpectation(value: any) {
+  protected getExpectation(value: any, isNegated = false) {
     const expectation = expect(value)
 
-    if (this.isNegated) {
+    if (isNegated) {
       return expectation.not
     }
 
@@ -117,11 +117,12 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   async run() {
     const output = await this.thunk(this.dispatch, this.getState, this.extraArg)
 
-    this.expectations.forEach(expectation => {
+    this.expectations.forEach(([expectation, isNegated]) => {
       expectation({
         dispatch: this.dispatch,
         getState: this.getState,
         extraArg: this.extraArg,
+        isNegated,
         output,
       })
     })

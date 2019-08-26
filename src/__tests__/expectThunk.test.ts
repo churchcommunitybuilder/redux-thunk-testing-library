@@ -118,8 +118,10 @@ describe('ThunkTestRunner inheritance', () => {
 
   class TestRunner extends ThunkTestRunner<Thunk, jest.Mock> {
     toCallExtraArgWith(expectedValue: any) {
-      return this.addExpectation(({ extraArg }) => {
-        this.getExpectation(extraArg).toHaveBeenCalledWith(expectedValue)
+      return this.addExpectation(({ extraArg, isNegated }) => {
+        this.getExpectation(extraArg, isNegated).toHaveBeenCalledWith(
+          expectedValue,
+        )
       })
     }
   }

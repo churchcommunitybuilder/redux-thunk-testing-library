@@ -8,6 +8,7 @@ type ExpectationContext<ExtraArg = any> = {
   dispatch: jest.Mock
   getState: jest.Mock
   extraArg: ExtraArg
+  isNegated: boolean
   output: any
 }
 

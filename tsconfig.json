@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "es5",
-    "lib": ["esnext"]
+    "lib": ["esnext", "dom"]
   },
   "exclude": [
     "dist",
