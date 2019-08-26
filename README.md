@@ -2,7 +2,7 @@
 Tools to test redux-thunk actions
 
 # Installation
-yarn add -D @churchcommunitybuilder/redux-thunk-testing-library
+`yarn add -D @churchcommunitybuilder/redux-thunk-testing-library`
 
 ## Usage
 Without needing to extend the test runner class, you can use the exported `expectThunk` function
