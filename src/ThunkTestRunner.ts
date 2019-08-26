@@ -17,10 +17,10 @@ const isMockImplementation = (
 ): mock is MockImplementation => typeof mock === 'function'
 
 export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
-  private isNegated = false
   private thunk: Thunk
   private expectations: Expectation<ExtraArg>[] = []
 
+  protected isNegated = false
   protected store: Store
   protected dispatch: jest.Mock
   protected getState: jest.Mock
