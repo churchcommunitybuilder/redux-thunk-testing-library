@@ -1,7 +1,16 @@
 {
   "compilerOptions": {
     "alwaysStrict": true,
+    "declaration": true,
     "esModuleInterop": true,
-    "target": "es6"
-  }
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "es6",
+  },
+  "exclude": [
+    "dist",
+    "**/__tests/"
+  ]
 }

@@ -44,7 +44,7 @@ export default class ThunkTestRunner<
     this.getState = jest.fn(this.store.getState)
   }
 
-  private mockDependency<
+  protected mockDependency<
     M extends MockReturns | MockImplementation,
     F extends jest.Mock
   >(mock: M, mockFn: F) {
@@ -57,7 +57,7 @@ export default class ThunkTestRunner<
     return this
   }
 
-  private addExpectation(expectation: Expectation<Options['extraArg']>) {
+  protected addExpectation(expectation: Expectation<Options['extraArg']>) {
     this.expectations = [...this.expectations, expectation]
 
     return this
@@ -95,7 +95,7 @@ export default class ThunkTestRunner<
     return this.addExpectation(expectation)
   }
 
-  private getExpectation(value: any) {
+  protected getExpectation(value: any) {
     const expectation = expect(value)
 
     if (this.nextAssertionIsInverted) {

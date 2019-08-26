@@ -2,13 +2,14 @@
   "name": "redux-thunk-testing-library",
   "version": "0.1.0",
   "description": "Tools to test redux-thunk actions",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/churchcommunitybuilder/redux-thunk-testing-library.git",
   "author": "Alex Beckwith <alfonz129@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "yarn jest --watch --verbose=false"
+    "test": "yarn jest --watch --verbose=false",
+    "build": "rm -rf dist && yarn tsc -p tsconfig.json"
   },
   "jest": {
     "preset": "ts-jest",
@@ -16,16 +17,16 @@
       "ts-jest": {
         "babelConfig": false
       }
-    }
+    },
+    "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
   },
   "dependencies": {
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "@types/ramda": "^0.26.18",
-    "@types/redux": "^3.6.0",
+    "@types/jest": "^24.0.18",
+    "@types/ramda": "^0.26.21",
     "prettier": "^1.18.2",
     "redux": "^4.0.4",
     "ts-jest": "^24.0.2",
