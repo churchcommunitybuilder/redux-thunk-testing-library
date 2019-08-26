@@ -4,7 +4,7 @@ import {
   MockImplementation,
   MockReturns,
   MockReturnsOrImplementation,
-  Thunk,
+  Thunk as DefaultThunk,
 } from './types'
 import { AnyAction, Store } from 'redux'
 
@@ -16,9 +16,9 @@ const isMockImplementation = (
   mock: MockReturnsOrImplementation,
 ): mock is MockImplementation => typeof mock === 'function'
 
-export class ThunkTestRunner<ExtraArg> {
+export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   private nextAssertionIsInverted = false
-  private thunk: Thunk<ExtraArg>
+  private thunk: Thunk
   private expectations: Expectation<ExtraArg>[] = []
 
   protected store: Store
@@ -32,7 +32,7 @@ export class ThunkTestRunner<ExtraArg> {
     return this
   }
 
-  constructor(thunk: Thunk<ExtraArg>, store: Store, extraArg?: ExtraArg) {
+  constructor(thunk: Thunk, store: Store, extraArg?: ExtraArg) {
     this.extraArg = extraArg
     this.store = store
     this.thunk = thunk

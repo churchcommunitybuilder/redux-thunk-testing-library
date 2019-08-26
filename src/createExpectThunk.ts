@@ -1,6 +1,6 @@
 import { Store } from 'redux'
 
-import { Thunk } from './types'
+import { Thunk as DefaultThunk } from './types'
 
 export const createExpectThunk = <
   Runner extends new (...args: any) => any,
@@ -9,5 +9,5 @@ export const createExpectThunk = <
   TestRunner: Runner,
   createStore: () => Store,
   getExtraArg: () => ExtraArg,
-) => (thunk: Thunk<ExtraArg>): InstanceType<Runner> =>
+) => <Thunk extends DefaultThunk>(thunk: Thunk): InstanceType<Runner> =>
   new TestRunner(thunk, createStore(), getExtraArg()) as any

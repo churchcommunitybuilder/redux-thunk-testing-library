@@ -1,6 +1,7 @@
 import { createExpectThunk } from '../createExpectThunk'
 import { getStore, setId, TestState } from '../testStore'
 import { ThunkTestRunner } from '../ThunkTestRunner'
+import { Thunk } from '../types'
 
 const actionCreator = (value: any) => ({ type: 'type', payload: value })
 const dispatchActionThunk = (value: any) => dispatch =>
@@ -111,11 +112,11 @@ describe('#expectThunk', () => {
 })
 
 describe('ThunkTestRunner inheritance', () => {
-  const thunk = (x: any) => (_, __, arg) => {
+  const thunk = (x: any) => (dispatch, getState, arg) => {
     arg(x)
   }
 
-  class TestRunner extends ThunkTestRunner<jest.Mock> {
+  class TestRunner extends ThunkTestRunner<Thunk, jest.Mock> {
     toCallExtraArgWith(expectedValue: any) {
       return this.addExpectation(({ extraArg }) => {
         this.getExpectation(extraArg).toHaveBeenCalledWith(expectedValue)
