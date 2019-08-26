@@ -1,5 +1,5 @@
 {
-  "name": "redux-thunk-testing-library",
+  "name": "@churchcommunitybuilder/redux-thunk-testing-library",
   "version": "0.1.0",
   "description": "Tools to test redux-thunk actions",
   "main": "dist/index.js",
