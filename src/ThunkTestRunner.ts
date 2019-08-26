@@ -17,7 +17,7 @@ const isMockImplementation = (
 ): mock is MockImplementation => typeof mock === 'function'
 
 export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
-  private nextAssertionIsInverted = false
+  private isNegated = false
   private thunk: Thunk
   private expectations: Expectation<ExtraArg>[] = []
 
@@ -27,7 +27,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   protected extraArg: ExtraArg
 
   get not() {
-    this.nextAssertionIsInverted = true
+    this.isNegated = true
 
     return this
   }
@@ -69,9 +69,13 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
     return this
   }
 
-  toDispatch(...action: any) {
+  toDispatch(...action: any[]) {
     return this.addExpectation(({ dispatch }) => {
-      this.getExpectation(dispatch).toHaveBeenCalledWith(...action)
+      if (action.length) {
+        this.getExpectation(dispatch).toHaveBeenCalledWith(...action)
+      } else {
+        this.getExpectation(dispatch).toHaveBeenCalled()
+      }
     })
   }
 
@@ -102,8 +106,8 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   protected getExpectation(value: any) {
     const expectation = expect(value)
 
-    if (this.nextAssertionIsInverted) {
-      this.nextAssertionIsInverted = false
+    if (this.isNegated) {
+      this.isNegated = false
       return expectation.not
     }
 
