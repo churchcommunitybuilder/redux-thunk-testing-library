@@ -1,6 +1,6 @@
 {
   "name": "@churchcommunitybuilder/redux-thunk-testing-library",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Tools to test redux-thunk actions",
   "main": "dist/index.js",
   "repository": "https://github.com/churchcommunitybuilder/redux-thunk-testing-library.git",
