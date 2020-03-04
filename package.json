@@ -1,18 +1,18 @@
 {
   "name": "@churchcommunitybuilder/redux-thunk-testing-library",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Tools to test redux-thunk actions",
   "main": "dist/index.js",
-  "repository": "https://github.com/churchcommunitybuilder/redux-thunk-testing-library.git",
+  "repository": "github:churchcommunitybuilder/redux-thunk-testing-library",
   "author": "Alex Beckwith <alfonz129@gmail.com>",
   "license": "MIT",
   "private": false,
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "/dist/**/*"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "test": "yarn jest --watch --verbose=false",
     "build": "rm -rf dist && yarn tsc -p tsconfig.json",
