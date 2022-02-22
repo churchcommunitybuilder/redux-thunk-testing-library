@@ -1,4 +1,4 @@
-import { createStore } from 'redux'
+import { createStore, combineReducers } from 'redux'
 
 const SET_ID = 'SET_ID'
 
@@ -14,6 +14,6 @@ const idReducer = (state = 0, action: Action) => {
   }
 }
 
-export const getStore = () => createStore<number, Action, any, any>(idReducer)
+export const getStore = () => createStore(combineReducers({ id: idReducer }))
 
 export type TestState = ReturnType<typeof getStore>

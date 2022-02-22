@@ -1,41 +1,35 @@
-import { createExpectThunk } from '../createExpectThunk'
-import { getStore, setId, TestState } from '../testStore'
+import { getStore, setId } from '../testStore'
 import { ThunkTestRunner } from '../ThunkTestRunner'
 import { Thunk } from '../types'
 
 const actionCreator = (value: any) => ({ type: 'type', payload: value })
+const unusedActionCreator = () => ({ type: 'other' })
 const dispatchActionThunk = (value: any) => dispatch =>
   dispatch(actionCreator(value))
-const dispatchThunk = dispatch => dispatch(1, 2)
-const getStateThunk = (_, getState) => getState()
+const getStateThunk = (_, getState) => getState().id
 const returnThunk = () => 2
 
 describe('#expectThunk', () => {
   const extraArg = jest.fn(() => 3)
-  const expectThunk = createExpectThunk(
-    ThunkTestRunner,
-    getStore,
-    () => extraArg,
-  )
+  const expectThunk = (thunk: any) => new ThunkTestRunner(thunk, getStore(), extraArg)
 
   describe('#withDispatch', () => {
     test('should mock dispatch implementation', async () => {
-      await expectThunk(dispatchThunk)
+      const { state } = await expectThunk(dispatchActionThunk(1))
         .withDispatch(dispatch =>
-          dispatch.mockImplementation((x: number, y: number) => x + y),
+          dispatch.mockImplementation(() => 3),
         )
-        .toDispatch(1, 2)
         .toReturn(3)
         .run()
+      state.id
     })
 
     test('should mock return values', async () => {
-      await expectThunk(dispatchThunk)
+      await expectThunk(dispatchActionThunk(1))
         .withDispatch({
-          args: [1, 2],
+          args: [actionCreator(1)],
           return: 3,
         })
-        .toDispatch(1, 2)
         .toReturn(3)
         .run()
     })
@@ -51,9 +45,9 @@ describe('#expectThunk', () => {
 
   describe('#toDispatch', () => {
     test('should assert that the action was dispatched', () =>
-      expectThunk(dispatchThunk)
-        .not.toDispatch(2, 2)
-        .toDispatch(1, 2)
+      expectThunk(dispatchActionThunk(1))
+        .not.toDispatch(unusedActionCreator())
+        .toDispatch(actionCreator(1))
         .run())
   })
 
@@ -66,8 +60,8 @@ describe('#expectThunk', () => {
     })
 
     test('should allow negation', () => {
-      return expectThunk(dispatchThunk)
-        .not.toDispatchActionType(actionCreator)
+      return expectThunk(dispatchActionThunk(1))
+        .not.toDispatchActionType(() => ({ type: 'other' }))
         .run()
     })
   })
@@ -83,9 +77,9 @@ describe('#expectThunk', () => {
   describe('#toMeetExpectation', () => {
     test('should meet custom expectations', () =>
       expectThunk(dispatch => {
-        dispatch()
-        dispatch()
-        dispatch()
+        dispatch(actionCreator(1))
+        dispatch(actionCreator(1))
+        dispatch(actionCreator(1))
       })
         .toMeetExpectation(({ dispatch }) => {
           expect(dispatch).toHaveBeenCalledTimes(3)
@@ -126,7 +120,7 @@ describe('ThunkTestRunner inheritance', () => {
     }
   }
 
-  const expectThunk = createExpectThunk(TestRunner, getStore, () => jest.fn())
+  const expectThunk = (thunk: any) => new TestRunner(thunk, getStore(), jest.fn())
 
   test('should be able to add expectation', () => {
     return expectThunk(thunk(1))
