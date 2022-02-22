@@ -16,14 +16,14 @@ const isMockImplementation = (
   mock: MockReturnsOrImplementation,
 ): mock is MockImplementation => typeof mock === 'function'
 
-export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
+export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, RunnerStore extends Store = Store> {
   private thunk: Thunk
   private expectations: ([Expectation<ExtraArg>, boolean])[] = []
 
   protected isNegated = false
-  protected store: Store
-  protected dispatch: jest.Mock
-  protected getState: jest.Mock
+  protected store: RunnerStore
+  protected dispatch: jest.Mock<ReturnType<RunnerStore['dispatch']>>
+  protected getState: jest.Mock<ReturnType<RunnerStore['getState']>>
   protected extraArg: ExtraArg
 
   get not() {
@@ -32,11 +32,11 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
     return this
   }
 
-  constructor(thunk: Thunk, store: Store, extraArg?: ExtraArg) {
+  constructor(thunk: Thunk, store: RunnerStore, extraArg?: ExtraArg) {
     this.extraArg = extraArg
     this.store = store
     this.thunk = thunk
-    this.dispatch = jest.fn()
+    this.dispatch = jest.fn(this.store.dispatch)
     this.getState = jest.fn(this.store.getState)
   }
 
@@ -65,7 +65,11 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any> {
   }
 
   withActions(...actions: any) {
-    actions.forEach(action => this.store.dispatch(action))
+    actions.forEach(action =>
+      (this.store.dispatch as any)(
+        ...(Array.isArray(action) ? action : [action]),
+      ),
+    )
 
     return this
   }
