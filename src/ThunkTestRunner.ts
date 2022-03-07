@@ -22,8 +22,8 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
 
   protected isNegated = false
   protected store: RunnerStore
-  protected dispatch: jest.Mock<ReturnType<RunnerStore['dispatch']>>
-  protected getState: jest.Mock<ReturnType<RunnerStore['getState']>>
+  protected dispatchSpy: jest.SpyInstance<ReturnType<RunnerStore['dispatch']>, [any]>
+  protected getStateSpy: jest.SpyInstance<ReturnType<RunnerStore['getState']>, []>
   protected extraArg: ExtraArg
 
   get not() {
@@ -34,15 +34,15 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
 
   constructor(thunk: Thunk, store: RunnerStore, extraArg?: ExtraArg) {
     this.extraArg = extraArg
-    this.store = store
     this.thunk = thunk
-    this.dispatch = jest.fn(this.store.dispatch)
-    this.getState = jest.fn(this.store.getState)
+    this.store = store
+    this.dispatchSpy = jest.spyOn(store, 'dispatch' as any) as any
+    this.getStateSpy = jest.spyOn(store, 'getState' as any) as any
   }
 
   protected mockDependency<
     M extends MockReturns | MockImplementation,
-    F extends jest.Mock
+    F extends jest.Mock | jest.SpyInstance
   >(mock: M, mockFn: F) {
     if (isMockReturns(mock)) {
       mockReturnValue(mockFn, mock)
@@ -61,12 +61,12 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
   }
 
   withDispatch(mockDispatch: MockReturnsOrImplementation) {
-    return this.mockDependency(mockDispatch, this.dispatch)
+    return this.mockDependency(mockDispatch, this.dispatchSpy)
   }
 
   withActions(...actions: any) {
     actions.forEach(action =>
-      (this.store.dispatch as any)(
+      (this.dispatchSpy as any)(
         ...(Array.isArray(action) ? action : [action]),
       ),
     )
@@ -119,12 +119,12 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
   }
 
   async run() {
-    const output = await this.thunk(this.dispatch, this.getState, this.extraArg)
+    const output = await this.thunk(this.dispatchSpy, this.getStateSpy, this.extraArg)
 
     this.expectations.forEach(([expectation, isNegated]) => {
       expectation({
-        dispatch: this.dispatch,
-        getState: this.getState,
+        dispatch: this.dispatchSpy,
+        getState: this.getStateSpy,
         extraArg: this.extraArg,
         isNegated,
         output,
@@ -132,8 +132,8 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
     })
 
     return {
-      dispatch: this.dispatch,
-      state: this.getState(),
+      dispatch: this.dispatchSpy,
+      state: this.store.getState(),
       extraArg: this.extraArg,
     }
   }
