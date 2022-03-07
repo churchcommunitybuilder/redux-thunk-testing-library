@@ -1,5 +1,4 @@
-import { combineReducers } from 'redux'
-import { configureStore, Store, } from '@reduxjs/toolkit'
+import { createStore, combineReducers } from 'redux'
 
 const SET_ID = 'SET_ID'
 
@@ -15,6 +14,4 @@ const idReducer = (state = 0, action: Action) => {
   }
 }
 
-export const getStore = (): Store<{ id: number }> => configureStore({
-  reducer: combineReducers({ id: idReducer }),
-})
+export const getStore = () => createStore(combineReducers({ id: idReducer }))
