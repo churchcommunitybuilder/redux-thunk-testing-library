@@ -1,12 +1,12 @@
 export type Thunk = (
-  dispatch: jest.Mock,
-  getState: jest.Mock,
+  dispatch: jest.SpyInstance,
+  getState: jest.SpyInstance,
   extraArg?: any,
 ) => any
 
 type ExpectationContext<ExtraArg = any> = {
-  dispatch: jest.Mock
-  getState: jest.Mock
+  dispatch: jest.SpyInstance
+  getState: jest.SpyInstance
   extraArg: ExtraArg
   isNegated: boolean
   output: any
@@ -23,6 +23,6 @@ export type MockReturn = {
 }
 
 export type MockReturns = MockReturn | MockReturn[]
-export type MockImplementation = (mockFn: jest.Mock) => void
+export type MockImplementation = (mockFn: jest.SpyInstance | jest.Mock) => void
 
 export type MockReturnsOrImplementation = MockReturns | MockImplementation

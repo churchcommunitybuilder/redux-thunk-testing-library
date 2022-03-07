@@ -18,10 +18,10 @@ const findMatch = (
 const isMockReturn = (mock: MockReturns): mock is MockReturn =>
   !Array.isArray(mock)
 
-export const mockReturnValue = (
-  mockFn: jest.Mock<any, any>,
+export const mockReturnValue = <MockFn extends jest.SpyInstance | jest.Mock<any, any>>(
+  mockFn: MockFn,
   mocks: MockReturns,
-) => {
+): MockFn => {
   mockFn.mockImplementation((...fnArgs: any[]) => {
     if (isMockReturn(mocks)) {
       return findMatch(fnArgs, mocks)
