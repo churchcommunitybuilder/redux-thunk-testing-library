@@ -22,8 +22,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
 
   protected isNegated = false
   protected store: RunnerStore
-  protected dispatchSpy: jest.SpyInstance<ReturnType<RunnerStore['dispatch']>, [any]>
-  protected getStateSpy: jest.SpyInstance<ReturnType<RunnerStore['getState']>, []>
+  protected dispatchSpy: jest.SpyInstance
   protected extraArg: ExtraArg
 
   get not() {
@@ -36,8 +35,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
     this.extraArg = extraArg
     this.thunk = thunk
     this.store = store
-    this.dispatchSpy = jest.spyOn(store, 'dispatch' as any) as any
-    this.getStateSpy = jest.spyOn(store, 'getState' as any) as any
+    this.dispatchSpy = jest.spyOn(store, 'dispatch' as any)
   }
 
   protected mockDependency<
@@ -66,7 +64,7 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
 
   withActions(...actions: any) {
     actions.forEach(action =>
-      (this.dispatchSpy as any)(
+      (this.store.dispatch as any)(
         ...(Array.isArray(action) ? action : [action]),
       ),
     )
@@ -89,6 +87,16 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
       this.getExpectation(dispatch, isNegated).toHaveBeenCalledWith(
         expect.objectContaining({ type: actionCreator().type }),
       )
+    })
+  }
+
+  toHaveState<Value>(
+    getActualValue: (state: ReturnType<RunnerStore['getState']>) => Value,
+    expectedValue: Value,
+  ) {
+    return this.addExpectation(({ getState, isNegated }) => {
+      const actualValue = getActualValue(getState())
+      this.getExpectation(actualValue, isNegated).toEqual(expectedValue)
     })
   }
 
@@ -119,12 +127,12 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
   }
 
   async run() {
-    const output = await this.thunk(this.dispatchSpy, this.getStateSpy, this.extraArg)
+    const output = await this.thunk(this.store.dispatch, this.store.getState, this.extraArg)
 
     this.expectations.forEach(([expectation, isNegated]) => {
       expectation({
         dispatch: this.dispatchSpy,
-        getState: this.getStateSpy,
+        getState: this.store.getState,
         extraArg: this.extraArg,
         isNegated,
         output,

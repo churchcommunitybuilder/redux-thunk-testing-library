@@ -1,12 +1,12 @@
 export type Thunk = (
-  dispatch: jest.SpyInstance,
-  getState: jest.SpyInstance,
+  dispatch: (action: any) => any,
+  getState: () => any,
   extraArg?: any,
 ) => any
 
 type ExpectationContext<ExtraArg = any> = {
   dispatch: jest.SpyInstance
-  getState: jest.SpyInstance
+  getState: () => any
   extraArg: ExtraArg
   isNegated: boolean
   output: any

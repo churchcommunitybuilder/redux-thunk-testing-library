@@ -2,10 +2,9 @@ import { getStore, setId } from '../testStore'
 import { ThunkTestRunner } from '../ThunkTestRunner'
 import { Thunk } from '../types'
 
-const actionCreator = (value: any) => ({ type: 'type', payload: value })
 const unusedActionCreator = () => ({ type: 'other' })
-const dispatchActionThunk = (value: any) => dispatch =>
-  dispatch(actionCreator(value))
+const dispatchActionThunk = (value: number) => dispatch =>
+  dispatch(setId(value))
 const getStateThunk = (_, getState) => getState().id
 const returnThunk = () => 2
 
@@ -27,7 +26,7 @@ describe('#expectThunk', () => {
     test('should mock return values', async () => {
       await expectThunk(dispatchActionThunk(1))
         .withDispatch({
-          args: [actionCreator(1)],
+          args: [setId(1)],
           return: 3,
         })
         .toReturn(3)
@@ -47,15 +46,15 @@ describe('#expectThunk', () => {
     test('should assert that the action was dispatched', () =>
       expectThunk(dispatchActionThunk(1))
         .not.toDispatch(unusedActionCreator())
-        .toDispatch(actionCreator(1))
+        .toDispatch(setId(1))
         .run())
   })
 
   describe('#toDispatchActionType', () => {
     test('should assert that the action type was dispatched', () => {
       return expectThunk(dispatchActionThunk(1))
-        .toDispatch(actionCreator(1))
-        .toDispatchActionType(actionCreator)
+        .toDispatch(setId(1))
+        .toDispatchActionType(setId)
         .run()
     })
 
@@ -64,6 +63,20 @@ describe('#expectThunk', () => {
         .not.toDispatchActionType(() => ({ type: 'other' }))
         .run()
     })
+  })
+
+  describe('#toHaveState', () => {
+    test('should assert the state value', () =>
+      expectThunk(dispatchActionThunk(1))
+        .toDispatch(setId(1))
+        .toHaveState(s => s.id, 1)
+        .run())
+
+    test('should be able to negate the assertion', () =>
+      expectThunk(dispatchActionThunk(1))
+        .toDispatch(setId(1))
+        .not.toHaveState(s => s.id, 2)
+        .run())
   })
 
   describe('#toReturn', () => {
@@ -77,9 +90,9 @@ describe('#expectThunk', () => {
   describe('#toMeetExpectation', () => {
     test('should meet custom expectations', () =>
       expectThunk(dispatch => {
-        dispatch(actionCreator(1))
-        dispatch(actionCreator(1))
-        dispatch(actionCreator(1))
+        dispatch(setId(1))
+        dispatch(setId(1))
+        dispatch(setId(1))
       })
         .toMeetExpectation(({ dispatch }) => {
           expect(dispatch).toHaveBeenCalledTimes(3)

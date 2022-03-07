@@ -22,7 +22,8 @@
     "preset": "ts-jest",
     "globals": {
       "ts-jest": {
-        "babelConfig": false
+        "babelConfig": false,
+        "diagnostics": false
       }
     },
     "testPathIgnorePatterns": [
@@ -35,6 +36,7 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
+    "@reduxjs/toolkit": "^1.8.0",
     "@types/jest": "^24.0.18",
     "@types/ramda": "^0.26.21",
     "prettier": "^1.18.2",
