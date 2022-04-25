@@ -124,6 +124,14 @@ describe('ThunkTestRunner inheritance', () => {
   }
 
   class TestRunner extends ThunkTestRunner<Thunk, jest.Mock> {
+    toBeAsync(value: any) {
+      return this.addExpectation(async ({ isNegated }) => {
+        await Promise.resolve()
+
+        this.getExpectation(value, isNegated).toBe(value)
+      })
+    }
+
     toCallExtraArgWith(expectedValue: any) {
       return this.addExpectation(({ extraArg, isNegated }) => {
         this.getExpectation(extraArg, isNegated).toHaveBeenCalledWith(
@@ -138,6 +146,12 @@ describe('ThunkTestRunner inheritance', () => {
   test('should be able to add expectation', () => {
     return expectThunk(thunk(1))
       .toCallExtraArgWith(1)
+      .run()
+  })
+
+  test('should be able to add async expectation', () => {
+    return expectThunk(thunk(1))
+      .toBeAsync(1)
       .run()
   })
 

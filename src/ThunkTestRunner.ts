@@ -129,15 +129,15 @@ export class ThunkTestRunner<Thunk extends DefaultThunk, ExtraArg extends any, R
   async run() {
     const output = await this.thunk(this.store.dispatch, this.store.getState, this.extraArg)
 
-    this.expectations.forEach(([expectation, isNegated]) => {
-      expectation({
+    for (const [expectation, isNegated] of this.expectations) {
+      await expectation({
         dispatch: this.dispatchSpy,
         getState: this.store.getState,
         extraArg: this.extraArg,
         isNegated,
         output,
       })
-    })
+    }
 
     return {
       dispatch: this.dispatchSpy,
